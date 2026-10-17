@@ -1,84 +1,42 @@
-import json
-import urllib.request
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import streamlit as st
 
-HTML_PAGE = """
-<!DOCTYPE html>
-<html>
-<head>
-<title>KALVI - Ungal AI Thozhan</title>
-<meta charset="UTF-8">
+st.set_page_config(page_title="KALVI - Ungal AI Thozhan", page_icon="📚", layout="wide")
+
+st.markdown("""
 <style>
-body { font-family: sans-serif; background: #0f172a; color: white; margin:0; display:flex; flex-direction:column; height:100vh; }
-.header { background: #1e293b; padding: 15px; text-align:center; font-size:22px; font-weight:bold; color: #38bdf8; }
-.chat { flex:1; overflow-y:auto; padding:20px; }
-.msg { margin:10px 0; padding:12px 15px; border-radius:15px; max-width:80%; }
-.user { background: #0284c7; align-self:flex-end; margin-left:auto; }
-.bot { background: #1e293b; border:1px solid #334155; }
-.input-area { display:flex; padding:15px; background:#1e293b; }
-input { flex:1; padding:12px; border-radius:20px; border:none; outline:none; }
-button { margin-left:10px; padding:12px 20px; border-radius:20px; border:none; background:#38bdf8; font-weight:bold; cursor:pointer; }
+body { background: #0f172a; }
+.main { background: #0f172a; }
 </style>
-</head>
-<body>
-<div class="header">KALVI - Ungal AI Thozhan 🎓</div>
-<div class="chat" id="chat">
-<div class="msg bot">Vanakkam Atchaya! Naan KALVI! Enkitta ethavathu kelunga! 😊</div>
-</div>
-<div class="input-area">
-<input id="q" placeholder="Ungal kelvi..." onkeypress="if(event.key=='Enter')send()">
-<button onclick="send()">Send</button>
-</div>
-<script>
-async function send(){
- let q=document.getElementById('q').value;
- if(!q) return;
- let chat=document.getElementById('chat');
- chat.innerHTML+=`<div class='msg user'>${q}</div>`;
- document.getElementById('q').value='';
- chat.scrollTop=chat.scrollHeight;
- let res=await fetch('/chat',{method:'POST',body:q});
- let ans=await res.text();
- chat.innerHTML+=`<div class='msg bot'>${ans}</div>`;
- chat.scrollTop=chat.scrollHeight;
-}
-</script>
-</body>
-</html>
-"""
+""", unsafe_allow_html=True)
 
-class Handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type','text/html; charset=utf-8')
-        self.end_headers()
-        self.wfile.write(HTML_PAGE.encode())
+st.title("📚 KALVI - Ungal AI Thozhan")
+st.subheader("AI Powered Learning Platform for Students")
 
-    def do_POST(self):
-        length = int(self.headers.get('content-length',0))
-        question = self.rfile.read(length).decode()
-        
-        data = {
-            "model": "llama3.2:1b",
-            "prompt": f"You are KALVI, a friendly AI assistant created by Atchaya. Answer helpfully. User: {question}",
-            "stream": False
-        }
-        req = urllib.request.Request(
-            "http://localhost:11434/api/generate",
-            data=json.dumps(data).encode(),
-            headers={'Content-Type':'application/json'}
-        )
-        try:
-            with urllib.request.urlopen(req) as resp:
-                result = json.loads(resp.read().decode())
-                answer = result.get('response','Error')
-        except Exception as e:
-            answer = f"Error: {e} - Ollama running ah nu paarunga"
-        
-        self.send_response(200)
-        self.send_header('Content-type','text/plain; charset=utf-8')
-        self.end_headers()
-        self.wfile.write(answer.encode())
+st.markdown("### 🚀 Founder: S.Atchaya")
+st.markdown("**Mission: Free Quality Education For All**")
 
-print("KALVI running at http://localhost:8000")
-HTTPServer(('localhost',8000), Handler).serve_forever()
+tab1, tab2, tab3, tab4 = st.tabs(["📖 1st-12th Std", "📝 TNPSC & GK", "📰 Daily News", "🤖 AI Chat"])
+
+with tab1:
+    st.header("1st to 12th Standard - All Subjects")
+    std = st.selectbox("Class Select Pannu", ["6th", "7th", "8th", "9th", "10th", "11th", "12th"])
+    subject = st.selectbox("Subject", ["Tamil", "English", "Maths", "Science", "Social"])
+    st.info(f"{std} - {subject} notes & lessons soon coming!")
+
+with tab2:
+    st.header("TNPSC, GK, General Knowledge")
+    st.write("TNPSC Group 1,2,4 questions, GK quizzes daily!")
+
+with tab3:
+    st.header("Daily News & Current Affairs")
+    st.write("Today news updates...")
+
+with tab4:
+    st.header("AI Thozhan Chat")
+    user_q = st.text_input("Enna doubt? Ketu parunga!")
+    if user_q:
+        st.success(f"Ungal kelvi: {user_q}")
+        st.write("AI Thozhan answer: Idhu KALVI AI chat - full feature soon varum da!")
+
+st.markdown("---")
+st.markdown("**KALVI © 2026 | Made with ❤️ by Atchaya**")
