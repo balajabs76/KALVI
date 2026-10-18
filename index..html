@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KALVI - Real AI</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family: 'Segoe UI', sans-serif;display:flex;height:100vh;background:#0f172a;color:white}
+.sidebar{width:280px;background:#020617;padding:16px;display:flex;flex-direction:column;gap:8px;border-right:1px solid #1e293b;overflow-y:auto}
+.sidebar h3{font-size:14px;opacity:0.8;margin:10px 0 5px}
+.quick-btn{background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 12px;border-radius:10px;text-align:left;cursor:pointer;font-size:13px;transition:0.2s}
+.quick-btn:hover{background:#334155}
+.main{flex:1;display:flex;flex-direction:column;background:#0f172a}
+.header{padding:16px;background:#020617;text-align:center;font-weight:bold;border-bottom:1px solid #1e293b}
+.chat{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.msg{max-width:85%;padding:14px 16px;border-radius:16px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-wrap:break-word}
+.bot{background:#1e293b;color:#f1f5f9;align-self:flex-start}
+.user{background:#2563eb;color:white;align-self:flex-end}
+.input-area{display:flex;gap:10px;padding:14px;background:#020617;border-top:1px solid #1e293b;align-items:center}
+.input-area input{flex:1;padding:14px 18px;border-radius:25px;border:1px solid #334155;background:#0f172a;color:white;outline:none}
+.icon-btn{background:#1e293b;border:none;min-width:45px;height:45px;border-radius:50%;cursor:pointer;color:white;font-size:18px}
+.send-btn{background:#2563eb}
+#typing{opacity:0.7;font-style:italic}
+@media(max-width:768px){.sidebar{display:none} .msg{max-width:95%}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2 style="font-size:18px;margin-bottom:10px">KALVI 📚</h2>
+<h3>⚡ Quick Click - Type Panna Venam</h3>
+<button class="quick-btn" onclick="quick('Explain photosynthesis in Tamil and English simple for 6th std')">🌱 Photosynthesis</button>
+<button class="quick-btn" onclick="quick('Explain Newton 3 laws in Tamil for 9th std')">🍎 Newton Laws</button>
+<button class="quick-btn" onclick="quick('Teach algebra basics in Tamil for 8th std students')">📐 Maths Algebra</button>
+<button class="quick-btn" onclick="quick('Write 10 lines Tamil essay about Bharathiyar')">📝 Tamil Essay</button>
+<button class="quick-btn" onclick="quick('What is AI? Explain for school students in Tamil')">🤖 AI Enna?</button>
+<button class="quick-btn" onclick="quick('Explain 12th std physics current electricity important questions')">⚡ 12th Physics</button>
+<button class="quick-btn" onclick="quick('Solve this maths problem step by step and explain in Tamil')">🧮 Maths Solve</button>
+<h3>Students-ku Help</h3>
+<p style="font-size:12px;opacity:0.6;line-height:1.5">6th to 12th Tamil Nadu Samacheer Kalvi syllabus full-a doubt clear pannum. Tamil, English rendulaeyum. ChatGPT maathiri enna kettalum!</p>
+</div>
+<div class="main">
+<div class="header">KALVI - Ungal AI Thozhan ✨ REAL ChatGPT</div>
+<div class="chat" id="chat">
+<div class="msg bot">Vanakkam! 🙏 Naan KALVI - Real AI!<br><br>✅ Enna doubt kettalum solven<br>✅ 6th to 12th full syllabus<br>✅ Tamil + English<br>✅ Homework, Essay, Code, Maths ellame!<br><br>ChatGPT maathiri than da! Kelvi kelu! 👇</div>
+</div>
+<div class="input-area">
+<button class="icon-btn" onclick="voice()" title="Voice">🎤</button>
+<input type="text" id="q" placeholder="Ethuvum kelu... What is photosynthesis? / Algebra puriyala...">
+<button class="icon-btn send-btn" onclick="send()">➤</button>
+</div>
+</div>
+<script>
+const API_KEY = "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"; // ITHULA KEY PASTE PANNU DA
+const chatDiv = document.getElementById('chat');
+const input = document.getElementById('q');
+
+async function askAI(question){
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+        method:"POST",
+        headers:{"Authorization":"Bearer "+API_KEY,"Content-Type":"application/json"},
+        body:JSON.stringify({
+            model:"llama-3.3-70b-versatile",
+            messages:[
+                {role:"system",content:"You are KALVI, Tamil Nadu's best AI teacher for 6th to 12th students (Samacheer Kalvi). You can do EVERYTHING ChatGPT does: Answer any question, homework help, essays, maths solving step-by-step, science explanation, coding, history, everything. ALWAYS detect language: If user uses Tamil words (enna, puriyala, enakku, sollu) or Tamil script, answer in Tamil (Tanglish okay). If English, answer English. If they ask both, give bilingual. Be friendly, use emojis, simple words. Never say you can't do. You are for students."},
+                {role:"user",content:question}
+            ],
+            temperature:0.7,
+            max_tokens:2000
+        })
+    });
+    const data = await response.json();
+    if(data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content;
+}
+
+async function send(){
+    let q = input.value.trim(); if(!q) return;
+    chatDiv.innerHTML += `<div class="msg user">${q}</div>`;
+    input.value = ''; chatDiv.scrollTop = chatDiv.scrollHeight;
+    chatDiv.innerHTML += `<div class="msg bot" id="typing">KALVI yosikkirathu... ✨</div>`;
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+    try{
+        let ans = await askAI(q);
+        document.getElementById('typing').remove();
+        let div = document.createElement('div');
+        div.className = 'msg bot';
+        div.innerHTML = marked.parse(ans);
+        chatDiv.appendChild(div);
+    }catch(e){
+        document.getElementById('typing').remove();
+        chatDiv.innerHTML += `<div class="msg bot" style="background:#7f1d1d">❌ Error da: ${e.message}<br><br>1. groq.com la API key eduthiya?<br>2. Key ah correct-a paste panniya? gsk_ nu start aaganum<br>3. Internet irukka nu paaru</div>`;
+    }
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+function quick(t){ input.value=t; send(); }
+function voice(){
+    if(!('webkitSpeechRecognition' in window)) { alert('Chrome la try pannu da'); return; }
+    let r = new webkitSpeechRecognition(); r.lang='ta-IN';
+    r.onresult = e=>{ input.value = e.results[0][0].transcript; send(); };
+    r.start();
+}
+input.addEventListener('keypress', e=>{ if(e.key==='Enter') send(); });
+</script>
+</body>
+</html>
